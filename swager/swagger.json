@@ -30,6 +30,25 @@
         }
       }
     },
+    "/api/v1/user/whoAmI": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/auth/registration": {
       "post": {
         "description": "",

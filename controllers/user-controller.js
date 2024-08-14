@@ -11,6 +11,18 @@ class UserController {
       next(e);
     }
   }
+  async whoAmI(req, res, next) {
+    try {
+      const user = await userService.whoAmI(req.user);
+      console.log(user)
+      return res.json(user);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
+
+
+
 
 module.exports = new UserController();

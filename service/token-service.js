@@ -11,7 +11,7 @@ class TokenService {
     const refreshToken = jwt.sign(
       payload,
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: '30s' }
+      { expiresIn: '30m' }
     );
     return {
       accessToken,

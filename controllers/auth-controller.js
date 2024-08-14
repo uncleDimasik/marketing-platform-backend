@@ -20,7 +20,9 @@ class AuthController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.json(userData);
+
+      const { refreshToken, ...cleanedData } = userData;
+      return res.json(cleanedData);
     } catch (e) {
       next(e);
     }
@@ -34,7 +36,8 @@ class AuthController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.json(userData);
+      const { refreshToken, ...cleanedData } = userData;
+      return res.json(cleanedData);
     } catch (e) {
       next(e);
     }
@@ -59,7 +62,8 @@ class AuthController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.json(userData);
+      const { refreshToken:rt, ...cleanedData } = userData;
+      return res.json(cleanedData);
     } catch (e) {
       next(e);
     }

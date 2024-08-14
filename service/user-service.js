@@ -30,7 +30,7 @@ class UserService {
     const user = await UserModel.findOne({ email });
     if (!user) {
       throw ApiError.BadRequest(
-        'Пользователь с таким email не найден'
+        'Not found user'
       );
     }
     const isPassEquals = await bcrypt.compare(
@@ -38,7 +38,7 @@ class UserService {
       user.password
     );
     if (!isPassEquals) {
-      throw ApiError.BadRequest('Неверный пароль');
+      throw ApiError.BadRequest('Invalid Password');
     }
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
@@ -72,6 +72,12 @@ class UserService {
   async getAllUsers() {
     const users = await UserModel.find();
     return users;
+  }
+
+  async whoAmI(userData) {
+    const user = await UserModel.findById(userData.id);
+    const userDto = new UserDto(user);
+    return userDto;
   }
 }
 
