@@ -8,7 +8,7 @@ class AuthController {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return next(
-          ApiError.BadRequest('Ошибка при валидации', errors.array())
+          ApiError.BadRequest('Validation Error', errors.array())
         );
       }
       const { email, password } = req.body;
@@ -62,7 +62,7 @@ class AuthController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      const { refreshToken:rt, ...cleanedData } = userData;
+      const { refreshToken: rt, ...cleanedData } = userData;
       return res.json(cleanedData);
     } catch (e) {
       next(e);

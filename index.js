@@ -21,8 +21,6 @@ app.use(
   })
 );
 
-
-
 app.use('/api/v1', v1Router);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
