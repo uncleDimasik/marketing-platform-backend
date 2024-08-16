@@ -5,9 +5,9 @@ const Campaign = require('../dtos/campaign-dto');
 const Forecast = require('../dtos/calculated-forecast-dto');
 class StatisticsController {
   async generateForecast(req, res, next) {
+
     try {
       const campaignDto = new Campaign(req.body);
-
       const { predictedImpressions, cpm } =
         await statisticsService.predictImpressions(
           campaignDto.bannerSize,

@@ -2,7 +2,8 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const Impression = require('../models/impression-model');
 
-const CHUNK_SIZE = 1000; // Define the size of each chunk
+const CHUNK_SIZE = 10_000;
+const USERS_NUMBER = 20_000;
 
 const getRandomBannerSize = () => {
   const sizes = ['300x250', '728x90', '160x600', '468x60'];
@@ -20,8 +21,9 @@ const getRandomCategory = () => {
   return categories[Math.floor(Math.random() * categories.length)];
 };
 
+
 const getRandomUserId = () =>
-  `user${Math.floor(Math.random() * 1000)}`;
+  `user${Math.floor(Math.random() * USERS_NUMBER)}`;
 
 const getRandomBid = () =>
   (Math.random() * (10 - 0.1) + 0.1).toFixed(1);
@@ -80,4 +82,5 @@ const seedImpressions = async (numImpressions = 10) => {
   }
 };
 
-seedImpressions(20000);
+seedImpressions(1_700_000);
+

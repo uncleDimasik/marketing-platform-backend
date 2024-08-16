@@ -1,13 +1,14 @@
 const Router = require('express').Router;
 const authController = require('../../controllers/auth-controller');
 const router = new Router();
-const { body } = require('express-validator');
+const { validateRegistration, validateLogin } = require('../../validators');
+const handleValidationErrors = require('../../middlewares/validation-middleware');
 
 router.post(
-  '/registration',
-  body('email').isEmail(),
-  body('password').isLength({ min: 3, max: 32 }),
-  authController.registration
+    '/registration',
+  validateRegistration,
+  handleValidationErrors,
+    authController.registration
 );
 router.post('/login', authController.login);
 router.post('/logout', authController.logout);
