@@ -3,15 +3,24 @@ const mongoose = require('mongoose');
 const Click = require('../models/click-model');
 const Impression = require('../models/impression-model');
 
+const CHUNK_SIZE = 1000; // Define the size of each chunk
+
+const generateRandomTimestampWithinLastYear = () => {
+  const now = Date.now();
+  const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000; // Calculate the timestamp for exactly one year ago
+
+  return new Date(
+      oneYearAgo + Math.floor(Math.random() * (now - oneYearAgo))
+  );
+};
+
 const generateRandomClicks = (impressions, numClicks) => {
   const clicks = [];
   for (let i = 0; i < numClicks; i++) {
     const randomImpression =
       impressions[Math.floor(Math.random() * impressions.length)];
     clicks.push({
-      timestamp: new Date(
-        Date.now() - Math.floor(Math.random() * 10000000000)
-      ),
+      timestamp:generateRandomTimestampWithinLastYear(),
       impression_id: randomImpression._id, // связываем с реальным Impression ID
       user_id: randomImpression.user_id, // совпадает с user_id из Impression
     });
@@ -41,12 +50,16 @@ const seedClicks = async (numClicks = 10) => {
     await Click.deleteMany({});
     console.log('Existing Click data removed');
 
-    const clicks = generateRandomClicks(impressions, numClicks);
+    const chunks = Math.ceil(numClicks / CHUNK_SIZE);
+    for (let i = 0; i < chunks; i++) {
+      const chunkSize = i === chunks  ? numClicks % CHUNK_SIZE : CHUNK_SIZE;
+      const clicks = generateRandomClicks(impressions, chunkSize);
 
-    await Click.insertMany(clicks);
-    console.log(
-      `Click data inserted successfully. Total records: ${numClicks}`
-    );
+      await Click.insertMany(clicks);
+      console.log(`Inserted chunk ${i + 1} of ${chunks} (Size: ${chunkSize})`);
+    }
+
+    console.log(`Click data inserted successfully. Total records: ${numClicks}`);
   } catch (error) {
     console.error('Error seeding Click data:', error);
   } finally {
@@ -54,4 +67,4 @@ const seedClicks = async (numClicks = 10) => {
   }
 };
 
-seedClicks(60);
+seedClicks(6000);

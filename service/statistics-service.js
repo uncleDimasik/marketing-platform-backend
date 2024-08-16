@@ -204,7 +204,7 @@ class StatisticsService {
     console.log('cpc');
     console.log(cpc);
 
-    const recommendedBid = ctr > 0 ? Math.min(cpc / ctr, 10) : 0.1; // Пример, можно настроить порог
+    const recommendedBid = ctr > 0 ? Math.min(cpc / ctr, 10) : 0.1; // можно настроить порог
 
     return recommendedBid;
   };

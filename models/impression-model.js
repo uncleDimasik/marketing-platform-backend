@@ -34,4 +34,8 @@ const ImpressionSchema = new Schema({
   },
 });
 
+ImpressionSchema.index({ user_id: 1 }); // Index on user_id for quick lookups
+ImpressionSchema.index({ timestamp: -1 }); // Index on timestamp for sorting and filtering by time
+ImpressionSchema.index({ banner_size: 1, category: 1 }); // Compound index on banner_size and category
+
 module.exports = model('Impression', ImpressionSchema);
