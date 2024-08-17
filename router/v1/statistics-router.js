@@ -5,6 +5,7 @@ const authMiddleware = require('../../middlewares/auth-middleware');
 const {validateForecast} = require("../../validators");
 const handleValidationErrors = require("../../middlewares/validation-middleware");
 
+
 router.post(
     '/forecast',
     authMiddleware,
