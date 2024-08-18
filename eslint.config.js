@@ -18,7 +18,7 @@ module.exports = [
         },
 
         rules: {
-  
+
             ...configs.recommended.rules,
 
             'no-console': 'warn',
