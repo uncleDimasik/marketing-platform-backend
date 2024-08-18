@@ -1,4 +1,9 @@
 const userService = require('../service/user-service');
+const {
+  setRefreshTokenCookie,
+  clearRefreshTokenCookie,
+} = require('../utils/cookieUtils');
+
 
 class AuthController {
   async registration(req, res, next) {
@@ -8,11 +13,7 @@ class AuthController {
         email,
         password
       );
-      res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
-
+      setRefreshTokenCookie(res, userData.refreshToken);
       const { refreshToken, ...cleanedData } = userData;
       return res.json(cleanedData);
     } catch (e) {
@@ -24,10 +25,7 @@ class AuthController {
     try {
       const { email, password } = req.body;
       const userData = await userService.login(email, password);
-      res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
+      setRefreshTokenCookie(res, userData.refreshToken);
       const { refreshToken, ...cleanedData } = userData;
       return res.json(cleanedData);
     } catch (e) {
@@ -37,9 +35,11 @@ class AuthController {
 
   async logout(req, res, next) {
     try {
-      const { refreshToken } = req.cookies;
+      const { refreshToken } = req.signedCookies;
       const token = await userService.logout(refreshToken);
-      res.clearCookie('refreshToken');
+
+      clearRefreshTokenCookie(res);
+
       return res.json(token);
     } catch (e) {
       next(e);
@@ -48,12 +48,9 @@ class AuthController {
 
   async refresh(req, res, next) {
     try {
-      const { refreshToken } = req.cookies;
+      const { refreshToken } = req.signedCookies;
       const userData = await userService.refresh(refreshToken);
-      res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
+      setRefreshTokenCookie(res, userData.refreshToken);
       const { refreshToken: rt, ...cleanedData } = userData;
       return res.json(cleanedData);
     } catch (e) {
