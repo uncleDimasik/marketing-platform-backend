@@ -19,5 +19,4 @@ const ClickSchema = new Schema({
 // Adding indexes
 ClickSchema.index({ impression_id: 1 }); // Index on impression_id for faster lookups
 
-
 module.exports = model('Click', ClickSchema);

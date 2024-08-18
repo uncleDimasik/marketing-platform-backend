@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const v1Router = require('./router/v1');
 const errorMiddleware = require('./middlewares/error-middleware');
-const helmet = require('helmet')
+const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swager/swagger.json');
 
@@ -21,7 +21,7 @@ app.use(
     origin: process.env.CLIENT_URL,
   })
 );
-app.use(helmet())
+app.use(helmet());
 
 app.use('/api/v1', v1Router);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));

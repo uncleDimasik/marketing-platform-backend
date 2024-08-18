@@ -21,7 +21,6 @@ const getRandomCategory = () => {
   return categories[Math.floor(Math.random() * categories.length)];
 };
 
-
 const getRandomUserId = () =>
   `user${Math.floor(Math.random() * USERS_NUMBER)}`;
 
@@ -33,7 +32,7 @@ const generateRandomTimestampWithinLastYear = () => {
   const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000; // Calculate the timestamp for exactly one year ago
 
   return new Date(
-      oneYearAgo + Math.floor(Math.random() * (now - oneYearAgo))
+    oneYearAgo + Math.floor(Math.random() * (now - oneYearAgo))
   );
 };
 
@@ -63,14 +62,16 @@ const seedImpressions = async (numImpressions = 10) => {
     await Impression.deleteMany({});
     console.log('Existing Impression data removed');
 
-
     const chunks = Math.ceil(numImpressions / CHUNK_SIZE);
     for (let i = 0; i < chunks; i++) {
-      const chunkSize = i === chunks  ? numImpressions % CHUNK_SIZE : CHUNK_SIZE;
+      const chunkSize =
+        i === chunks ? numImpressions % CHUNK_SIZE : CHUNK_SIZE;
       const impressions = generateRandomImpressions(chunkSize);
 
       await Impression.insertMany(impressions);
-      console.log(`Inserted chunk ${i + 1} of ${chunks} (Size: ${chunkSize})`);
+      console.log(
+        `Inserted chunk ${i + 1} of ${chunks} (Size: ${chunkSize})`
+      );
     }
     console.log(
       `Impression data inserted successfully. Total records: ${numImpressions}`
@@ -83,4 +84,3 @@ const seedImpressions = async (numImpressions = 10) => {
 };
 
 seedImpressions(1_700_000);
-
