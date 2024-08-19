@@ -4,9 +4,8 @@ const getCookieOptions = ({ clear = false } = {}) => {
     httpOnly: true,
     signed: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
+    sameSite: 'Lax',
     path: '/',
-    domain: process.env.COOKIE_DOMAIN || undefined,
   };
 };
 
