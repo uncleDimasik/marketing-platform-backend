@@ -18,9 +18,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(
     cors({
         origin: 'https://marketing-platform-frontend.vercel.app',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
-        allowedHeaders: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
     })
 );
 app.use(helmet());
