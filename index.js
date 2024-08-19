@@ -18,7 +18,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(
     cors({
         origin: process.env.CLIENT_URL,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
         allowedHeaders: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
     })
