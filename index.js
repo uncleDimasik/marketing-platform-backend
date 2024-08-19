@@ -17,7 +17,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use(
     cors({
-        origin: 'https://marketing-platform-frontend.vercel.app',
+        origin: process.env.CLIENT_URL,
         credentials: true,
     })
 );
