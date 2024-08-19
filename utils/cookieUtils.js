@@ -5,7 +5,6 @@ const getCookieOptions = ({ clear = false } = {}) => {
     signed: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.COOKIE_SAME_SITE,
-    path: process.env.COOKIE_PATH || '/',
     domain: process.env.COOKIE_DOMAIN || undefined,
   };
 };
