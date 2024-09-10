@@ -1,89 +1,69 @@
-const Impression = require('../models/impression-model');
-const Cache = require('../models/cache-model');
+require('dotenv').config();
+const {clickhouseClient: clClient} = require("../storage/clickhouse");
+
+// Настройка клиента ClickHouse
+const clickhouseClient = clClient;
 
 class StatisticsService {
-  //можно ще денормалізувати данні, наприклад, зберігати кліки в показах і/або обмежити час
-  async getStatistics(bannerSize, category) {
-    //кешуемо наразі в монго, потім можно пеїхати на редіс
-    const cacheKey = `stats:${bannerSize}:${category}`;
+    async getStatistics(bannerSize, category) {
+        const query = `
+            SELECT
+              COUNT() AS totalImpressions,
+              uniq(user_id) AS uniqueUsers,
+              SUM(bid) AS totalBid,
+              COUNT(clicks.impression_id) AS totalClicks
+            FROM impressions AS fi
+            LEFT JOIN clicks AS c
+              ON fi.impression_id = c.impression_id
+            WHERE
+              fi.banner_size = '${bannerSize}' AND
+              fi.category = '${category}'
+        `;
 
-    let cachedData;
-    try {
-      cachedData = await Cache.findOne({ key: cacheKey });
-    } catch (error) {
-      console.error('Error while fetching cache data:', error);
+        let impressionsQuery;
+        try {
+            impressionsQuery = await clickhouseClient.query({
+                query,
+                format: 'JSONEachRow',
+                params: {bannerSize, category}
+            });
+        } catch (error) {
+            console.error('Error querying ClickHouse:', error);
+            throw error;
+        }
+
+        const impressions = await impressionsQuery.json();
+        const [result] = impressions;
+
+        const totalImpressions = result?.totalImpressions || 0;
+        const totalClicks = result?.totalClicks || 0;
+        const uniqueUsers = result?.uniqueUsers || 0;
+        const totalBid = result?.totalBid || 0;
+        const avgBid = totalImpressions > 0 ? totalBid / totalImpressions : 0;
+
+        return {
+            totalImpressions,
+            totalClicks,
+            uniqueUsers,
+            avgBid
+        };
     }
 
-    if (cachedData) {
-      return cachedData.value;
+    predictCampaignPerformance(budget, stats) {
+        const recommendedBid = stats.avgBid;
+        const cpm = recommendedBid * 1000;
+        const predictedImpressions = (budget / cpm) * 1000;
+        const ctr = stats.totalClicks / stats.totalImpressions;
+        const predictedClicks = predictedImpressions * ctr;
+        const predictedUniqueUsers = (stats.uniqueUsers / stats.totalImpressions) * predictedImpressions;
+
+        return {
+            predictedImpressions: Math.round(predictedImpressions),
+            predictedClicks: Math.round(predictedClicks),
+            predictedUniqueUsers: Math.round(predictedUniqueUsers),
+            recommendedBid
+        };
     }
-
-    const impressions = await Impression.aggregate([
-      { $match: { banner_size: bannerSize, category: category } },
-      {
-        $lookup: {
-          from: 'clicks',
-          localField: '_id',
-          foreignField: 'impression_id',
-          as: 'clicks',
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalImpressions: { $sum: 1 },
-          uniqueUsers: { $addToSet: '$user_id' },
-          totalBid: { $sum: '$bid' },
-          totalClicks: { $sum: { $size: '$clicks' } },
-        },
-      },
-      {
-        $project: {
-          totalImpressions: 1,
-          uniqueUsers: { $size: '$uniqueUsers' },
-          totalBid: 1,
-          totalClicks: 1,
-        },
-      },
-    ]);
-
-    console.log(impressions);
-
-    const totalImpressions = impressions[0]?.totalImpressions || 0;
-    const totalClicks = impressions[0]?.totalClicks || 0;
-    const uniqueUsers = impressions[0]?.uniqueUsers || 0;
-    const totalBid = impressions[0]?.totalBid || 0;
-    const avgBid = totalBid / totalImpressions;
-
-    const result = {
-      totalImpressions: totalImpressions,
-      totalClicks: totalClicks,
-      uniqueUsers: uniqueUsers,
-      avgBid: avgBid,
-    };
-
-    await Cache.create({ key: cacheKey, value: result });
-
-    return result;
-  }
-
-  predictCampaignPerformance(budget, stats) {
-    const recommendedBid = stats.avgBid;
-    const cpm = recommendedBid * 1000;
-    const predictedImpressions = (budget / cpm) * 1000;
-    const ctr = stats.totalClicks / stats.totalImpressions;
-    const predictedClicks = predictedImpressions * ctr;
-    const predictedUniqueUsers =
-      (stats.uniqueUsers / stats.totalImpressions) *
-      predictedImpressions;
-
-    return {
-      predictedImpressions: Math.round(predictedImpressions),
-      predictedClicks: Math.round(predictedClicks),
-      predictedUniqueUsers: Math.round(predictedUniqueUsers),
-      recommendedBid: recommendedBid,
-    };
-  }
 }
 
 module.exports = new StatisticsService();

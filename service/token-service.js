@@ -31,7 +31,7 @@ class TokenService {
     }
   }
 
-  validateRefreshToken(token) {
+    validateRefreshToken(token) {
     try {
       const userData = jwt.verify(
         token,
